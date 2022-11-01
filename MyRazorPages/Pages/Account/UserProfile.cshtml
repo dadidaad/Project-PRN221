@@ -1,0 +1,68 @@
+﻿@page
+@model MyRazorPages.Pages.Account.UserProfileModel
+@{
+}
+<div id="content">
+    <div id="content-left">
+        <h3 style="font-weight: normal;">Welcome, @ViewData["Display name"]</h3>
+        <h4 style="font-weight: bold; color: darkred">@ViewData["Role"]</h4>
+        <h3>Account Management</h3>
+        <ul>
+            <a href="~/account/userprofile">
+            <li>Personal information</li></a>
+        </ul>
+        <h3>My order</h3>
+        <ul>
+            <a href="~/account/userorder">
+            <li>All orders</li></a>
+            <a href="#">
+            <li>Canceled order</li></a>
+        </ul>
+    </div>
+    <div id="content-right">
+        <div class="path">Personal information</b></div>
+        <div class="content-main">
+            @if(ViewData["user"] != null){
+                var user = ViewData["user"] as Account;
+                <form method="post">
+                    <div id="profile-content">
+                        @if(user.Role == 2){
+                            <div class="profile-content-col">
+                                <div>
+                                    Company name: <br />
+                                    <input value="@user.Customer.CompanyName" asp-for="Customer.CompanyName" />
+                                </div>
+                                <span class="msg-error" asp-validation-for="Customer.CompanyName"></span><br />
+                                <div>
+                                    Contact name: <br />
+                                    <input value="@user.Customer.ContactName" asp-for="Customer.ContactName" />
+                                </div>
+                                <span class="msg-error" asp-validation-for="Customer.ContactName"></span><br />
+                            </div>
+                            <div class="profile-content-col">
+                                <div>
+                                    Company title: <br />
+                                    <input value="@user.Customer.ContactTitle" asp-for="Customer.ContactTitle" />
+                                </div>
+                                <span class="msg-error" asp-validation-for="Customer.ContactTitle"></span><br />
+                                <div>
+                                    Address: <br />
+                                    <input value="@user.Customer.Address" asp-for="Customer.Address" />
+                                </div>
+                                <span class="msg-error" asp-validation-for="Customer.Address"></span><br />
+                            </div>
+                        }
+                        <div class="profile-content-col">
+                            <div>Email: <br />
+                                @user.Email    
+                            </div>
+                        </div>
+                        <div>
+                            <input type="submit" value="Edit info" />
+                        </div>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+</div>

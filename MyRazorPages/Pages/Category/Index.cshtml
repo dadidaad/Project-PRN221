@@ -1,0 +1,83 @@
+﻿@page
+@model MyRazorPages.Pages.Category.IndexModel
+@{
+}
+
+<div id="content-left">
+    <h3>CATEGORY</h3>
+    <ul>
+        @foreach (var cat in Model.Categories)
+        {
+            <a href="~/Category/Index?categoryId=@cat.CategoryId">
+            <li>@cat.CategoryName</li></a>
+        }
+    </ul>
+</div>
+<div id="content-right">
+    <div class="path">@(Model.Category != null ? Model.Category.CategoryName : "All products" )</div>
+    <div class="content-main">
+        @foreach (var product in Model.Products)
+        {
+            <div class="product">
+                <a href="~/product/detail?id=@product.ProductId"><img src="~/img/1.jpg" width="100%" /></a>
+                <div class="name"><a href="~/product/detail?id=@product.ProductId">@product.ProductName</a></div>
+                <div class="price">$@(((float)product.UnitPrice).ToString("0.00"))</div>
+                <div><a asp-page="/Account/Cart" asp-page-handler="buyNow" asp-route-ProductId="@product.ProductId">Buy now</a></div>
+            </div>
+        }
+    </div>
+    <div id="paging">
+        <div class="pagination">
+            @{
+                var prevDisabled = !Model.Products.HasPreviousPage ? "disabled" : "";
+                var nextDisabled = !Model.Products.HasNextPage ? "disabled" : "";
+            }
+            <a asp-page="/Category/Index"
+               asp-route-pageIndex="1"
+               asp-route-categoryId="@(Model.Category != null ? Model.Category.CategoryId : "")"
+               >
+                First page
+            </a>
+            <a asp-page="/Category/Index"
+               asp-route-pageIndex="@(Model.Products.PageIndex - 1)"
+               asp-route-categoryId="@(Model.Category != null ? Model.Category.CategoryId : "")"
+               class="@prevDisabled">
+                Previous
+            </a>
+            @{
+                int totalDisplay = 0;
+                int factor = 0;
+                if(Model.Products.TotalPages <= 10){
+                    totalDisplay = Model.Products.TotalPages;
+                }
+                else{
+                    factor = Math.Floor((double)Model.Products.PageIndex / 10) > 0 ? Convert.ToInt32(Math.Floor((double)Model.Products.PageIndex / 10)) : 0;
+                    totalDisplay = Model.Products.TotalPages - (factor * 10) >= 10 ? (factor + 1) * 10 : Model.Products.TotalPages;
+                }
+            }
+            @for (int i = factor * 10 ; i <= totalDisplay; i++)
+            {
+                if(i == 0){
+                    continue;
+                }
+                var isActive = Model.Products.PageIndex == i ? "active" : "";
+                <a asp-page="/Category/Index"
+               asp-route-pageIndex="@i"
+               asp-route-categoryId="@(Model.Category != null ? Model.Category.CategoryId : "" )"
+               class="@isActive">@i</a>
+            }
+            <a asp-page="/Category/Index"
+               asp-route-pageIndex="@(Model.Products.PageIndex + 1)"
+               asp-route-categoryId="@(Model.Category != null ? Model.Category.CategoryId : "" )"
+               class="@nextDisabled">
+                Next
+            </a>
+            <a asp-page="/Category/Index"
+               asp-route-pageIndex="@(Model.Products.TotalPages)"
+               asp-route-categoryId="@(Model.Category != null ? Model.Category.CategoryId : "" )"
+               >
+                Last Page
+            </a>
+        </div>
+    </div>
+</div>

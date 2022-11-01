@@ -1,0 +1,130 @@
+﻿@page
+@model MyRazorPages.Pages.Admin.Order.OrderModel
+@{
+}
+
+<div class="path-admin">ORDERS LIST</b></div>
+<div class="content-main">
+    <div id="content-main-dashboard">
+        <div id="order-title">
+            <b>Filter by Order date:</b>
+            <form>
+                From:@Html.TextBoxFor(c => c.CurrentFilterFromDate, new { @type="date",  @Value = Model.CurrentFilterFromDate?.ToString("d") ?? String.Format("yyyy-MM-dd") } )
+                To:@Html.TextBoxFor(c => c.CurrentFilterToDate, new { @type="date",  @Value = Model.CurrentFilterToDate?.ToString("d") ?? String.Format("yyyy-MM-dd")} )
+                <input type="submit" value="Filter">
+            </form>
+            @if(ViewData["date_noti"] != null){
+                <p style="color:red">@ViewData["date_noti"]</p>
+            }
+        </div>
+        <div id="order-table">
+            <table id="orders">
+                <thead>
+                    <tr>
+                        <th>OrderID</th>
+                        <th>OrderDate</th>
+                        <th>RequiredDate</th>
+                        <th>ShippedDate</th>
+                        <th>Employee</th>
+                        <th>Customer</th>
+                        <th>Freight($)</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersAdminBody">
+                    @foreach (var order in Model.Orders)
+                    {
+                        <tr>
+                            <td>
+                                <a asp-page="/Admin/Order/OrderDetail"
+                               asp-route-OrderId="@order.OrderId">@order.OrderId</a>
+                            </td>
+                            <td>@Convert.ToDateTime(order.OrderDate).ToString("dd/MM/yyyy")</td>
+                            <td>@(order.RequiredDate == null ? "" : Convert.ToDateTime(order.RequiredDate).ToString("dd/MM/yyyy"))</td>
+                            <td>@(order.ShippedDate == null ? "" : Convert.ToDateTime(order.ShippedDate).ToString("dd/MM/yyyy"))</td>
+                            <td>@Html.DisplayFor(modelItem => order.Employee.LastName)</td>
+                            <td>@Html.DisplayFor(modelItem => order.Customer.ContactName)</td>
+                            <td>@Html.DisplayFor(modelItem => order.Freight)</td>
+                            <td>
+                                @if (order.ShippedDate != null)
+                                {
+                                    <p style="color:green">Completed</p>
+                                }
+                                @if (order.ShippedDate == null && order.Employee == null && order.RequiredDate != null)
+                                {
+                                    <p style="color:blue">Pending</p>
+                                    <a asp-page="order" asp-page-handler="cancelOrder" asp-route-OrderId="@order.OrderId" style="color:red">Cancel</a>
+                                }
+                                @if (order.RequiredDate == null)
+                                {
+                                    <p style="color: red">Canceled</p>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div id="paging">
+            <div class="pagination">
+                @{
+                    var prevDisabled = !Model.Orders.HasPreviousPage ? "disabled" : "";
+                    var nextDisabled = !Model.Orders.HasNextPage ? "disabled" : "";
+                }
+                <a asp-page="/Admin/Order/Order"
+                   asp-route-pageIndex="1"
+                   asp-route-CurrentFilterFromDate="@Model.CurrentFilterFromDate"
+                   asp-route-CurrentFilterToDate="@Model.CurrentFilterToDate"
+                   >
+                    First page
+                </a>
+                <a asp-page="/Admin/Order/Order"
+                   asp-route-pageIndex="@(Model.Orders.PageIndex - 1)"
+                   asp-route-CurrentFilterFromDate="@Model.CurrentFilterFromDate"
+                   asp-route-CurrentFilterToDate="@Model.CurrentFilterToDate"
+                   class="@prevDisabled">
+                    Previous
+                </a>
+                @{
+                    int totalDisplay = 0;
+                    int factor = 0;
+                    if (Model.Orders.TotalPages <= 10)
+                    {
+                        totalDisplay = Model.Orders.TotalPages;
+                    }
+                    else
+                    {
+                        factor = Math.Floor((double)Model.Orders.PageIndex / 10) > 0 ? Convert.ToInt32(Math.Floor((double)Model.Orders.PageIndex / 10)) : 0;
+                        totalDisplay = Model.Orders.TotalPages - (factor * 10) >= 10 ? (factor + 1) * 10 : Model.Orders.TotalPages;
+                    }
+                }
+                @for (int i = factor * 10; i <= totalDisplay; i++)
+                {
+                    if(i == 0){
+                        continue;
+                    }
+                        var isActive = Model.Orders.PageIndex == i ? "active" : "";
+                        <a asp-page="/Admin/Order/Order"
+                   asp-route-pageIndex="@i"
+                   asp-route-CurrentFilterFromDate="@Model.CurrentFilterFromDate"
+                   asp-route-CurrentFilterToDate="@Model.CurrentFilterToDate"
+                   class="@isActive">@i</a>
+                }
+                <a asp-page="/Admin/Order/Order"
+                   asp-route-pageIndex="@(Model.Orders.PageIndex + 1)"
+                   asp-route-CurrentFilterFromDate="@Model.CurrentFilterFromDate"
+                   asp-route-CurrentFilterToDate="@Model.CurrentFilterToDate"
+                   class="@nextDisabled">
+                    Next
+                </a>
+                <a asp-page="/Admin/Order/Order"
+                   asp-route-pageIndex="@Model.Orders.TotalPages"
+                   asp-route-CurrentFilterFromDate="@Model.CurrentFilterFromDate"
+                   asp-route-CurrentFilterToDate="@Model.CurrentFilterToDate"
+                  >
+                    Last page
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

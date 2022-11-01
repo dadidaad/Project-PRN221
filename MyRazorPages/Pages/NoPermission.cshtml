@@ -1,0 +1,12 @@
+﻿@page
+@model MyRazorPages.Pages.Admin.NoPermissionModel
+@{
+}
+<p>You have no permission to access this page</p>
+<br>
+<p>Return homepage after 5 seconds</p>
+<script>
+    setTimeout(function () {
+        window.location.href = '/Index';
+    }, 5000);
+</script>

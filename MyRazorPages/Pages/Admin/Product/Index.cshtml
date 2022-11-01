@@ -1,0 +1,169 @@
+﻿@page
+@model MyRazorPages.Pages.Admin.Product.IndexModel
+@{
+}
+<div class="path-admin">PRODUCTS LIST</b></div>
+<div class="content-main">
+    <div id="content-main-dashboard">
+        <div id="product-title-header">
+            <div id="product-title-1" style="width: 25%;">
+                <b>Filter by Catetory:</b>
+                <form>
+                    <select asp-for="FilterOption"
+                            asp-items="@(new SelectList(Model.Categories, nameof(Category.CategoryId), nameof(Category.CategoryName)))">
+                        <option>Please select one</option>
+                    </select>
+
+                    <input type="submit" value="Filter" />
+                </form>
+            </div>
+            <div id="product-title-2" style="width: 55%;">
+                <form>
+                    @Html.TextBoxFor(c => c.SearchString, new {@Value = Model.SearchString ,@placeholder="Enter product name to search"})
+                    <input type="submit" value="Search" />
+                </form>
+            </div>
+            <div id="product-title-3" style="width: 20%;">
+                <a href="/Admin/Product/Create">Create a new Product</a>
+                @*@using (Html.BeginForm("UploadExcel", "/Admin/Product/Index", FormMethod.Post, new { enctype = "multipart/form-data", onsubmit = "return Validate(this);", id="uploadForm" }))
+                {
+                    <div class="form-group">
+                        <div class="control-label col-md-2">Import xls or xlsx:</div>
+                        <div class="col-md-10">
+                            <input type="file" id="FileUpload" name="FileUpload" class="" onchange="document.getElementById('uploadForm').submit();" />
+                        </div>
+                    </div>
+                }*@
+                <form action="" method="post" enctype="multipart/form-data" onsubmit="return Validate(this);" id="uploadForm">
+                    <label for="upload-file">Import .xls or .xlsx file</label>
+                    <input type="file" name="FileUpload" id="upload-file" onchange="document.getElementById('uploadForm').submit();" />
+                </form>
+                <script>
+                    var _validFileExtensions = [".xls", ".xlsx"];
+                    function Validate(oForm) {
+                        var arrInputs = oForm.getElementsByTagName("input");
+                        for (var i = 0; i < arrInputs.length; i++) {
+                            var oInput = arrInputs[i];
+                            if (oInput.type == "file") {
+                                var sFileName = oInput.value;
+                                if (sFileName.length > 0) {
+                                    var blnValid = false;
+                                    for (var j = 0; j < _validFileExtensions.length; j++) {
+                                        var sCurExtension = _validFileExtensions[j];
+                                        if (sFileName.substr(sFileName.length - sCurExtension.length, sCurExtension.length).toLowerCase() == sCurExtension.toLowerCase()) {
+                                            blnValid = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if (!blnValid) {
+                                        alert("Sorry, " + sFileName + " is invalid, allowed extensions are: " + _validFileExtensions.join(", "));
+                                        return false;
+                                    }
+                                }
+                            }
+                        }
+
+                        return true;
+
+                </script>
+            </div>
+        </div>
+        <div id="order-table-admin">
+            <table id="orders">
+                <thead>
+                    <tr>
+                        <th>ProductID</th>
+                        <th>ProductName</th>
+                        <th>UnitPrice</th>
+                        <th>Unit</th>
+                        <th>UnitsInStock</th>
+                        <th>Category</th>
+                        <th>Discontinued</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="productsTable">
+                    @foreach (var product in Model.Products)
+                    {
+                        <tr>
+                            <td>@product.ProductId</td>
+                            <td>@product.ProductName</td>
+                            <td>@(((float)product.UnitPrice).ToString("0.00"))</td>
+                            <td>@product.QuantityPerUnit</td>
+                            <td>@product.UnitsInStock</td>
+                            <td>@product.Category.CategoryName</td>
+                            <td>@product.Discontinued</td>
+                            <td>
+                                <a href="/Admin/Product/Edit?ProductId=@product.ProductId">Edit</a> &nbsp; | &nbsp;
+                                <a href="/Admin/Product/Delete?ProductId=@product.ProductId">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+        <div id="paging">
+            <div class="pagination">
+                @{
+                    var prevDisabled = !Model.Products.HasPreviousPage ? "disabled" : "";
+                    var nextDisabled = !Model.Products.HasNextPage ? "disabled" : "";
+                }
+                <a asp-page="/Admin/Product/Index"
+                   asp-route-pageIndex="1"
+                   asp-route-SearchString="@Model.SearchString"
+                   asp-route-FilterOption="@Model.FilterOption"
+                   >
+                    First Page
+                </a>
+                <a asp-page="/Admin/Product/Index"
+                   asp-route-pageIndex="@(Model.Products.PageIndex - 1)"
+                   asp-route-SearchString="@Model.SearchString"
+                   asp-route-FilterOption="@Model.FilterOption"
+                   class="@prevDisabled">
+                    Previous
+                </a>
+                @{
+                    int totalDisplay = 0;
+                    int factor = 0;
+                    if (Model.Products.TotalPages <= 10)
+                    {
+                        totalDisplay = Model.Products.TotalPages;
+                    }
+                    else
+                    {
+                        factor = Math.Floor((double)Model.Products.PageIndex / 10) > 0 ? Convert.ToInt32(Math.Floor((double)Model.Products.PageIndex / 10)) : 0;
+                        totalDisplay = Model.Products.TotalPages - (factor * 10) >= 10 ? (factor + 1) * 10 : Model.Products.TotalPages;
+                    }
+                }
+                @for (int i = factor * 10; i <= totalDisplay; i++)
+                {
+                    if(i == 0){
+                        continue;
+                    }
+                    var isActive = Model.Products.PageIndex == i ? "active" : "";
+                    <a asp-page="/Admin/Product/Index"
+                   asp-route-pageIndex="@i"
+                   asp-route-SearchString="@Model.SearchString"
+                   asp-route-FilterOption="@Model.FilterOption"
+                   class="@isActive">@i</a>
+                }
+                <a asp-page="/Admin/Product/Index"
+                   asp-route-pageIndex="@(Model.Products.PageIndex + 1)"
+                   asp-route-SearchString="@Model.SearchString"
+                   asp-route-FilterOption="@Model.FilterOption"
+                   class="@nextDisabled">
+                    Next
+                </a>
+                <a asp-page="/Admin/Product/Index"
+                   asp-route-pageIndex="@(Model.Products.TotalPages)"
+                   asp-route-SearchString="@Model.SearchString"
+                   asp-route-FilterOption="@Model.FilterOption"
+                   >
+                    Last Page
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,91 @@
+﻿@page
+@model MyRazorPages.Pages.Account.CartModel
+@{
+}
+
+<div id="content">
+    <div id="cart">
+        <div id="cart-title">
+            <h3>SHOPPING CART</h3>
+        </div>
+        <div id="cart-content">
+            @if(ViewData["cart"] != null){
+                var cartList = ViewData["cart"] as List<Cart>;
+                foreach(var cart in cartList ){
+                    <div class="cart-item">
+                        <div class="cart-item-infor">
+                            <div class="cart-item-img">
+                                <img src="~/img/1.jpg" />
+                            </div>
+                            @{
+                                var dbContext = new PRN221DBContext();
+                                var product = dbContext.Products.FirstOrDefault(p => p.ProductId == cart.ProductId);
+                            }
+                            <div class="cart-item-name">
+                                <a href="detail.html?id=@cart.ProductId">Product @product.ProductName</a>
+                            </div>
+                            <div class="cart-item-price">
+                                @(((float)product.UnitPrice).ToString("0.00"))
+                            </div>
+                            <div class="cart-item-button">
+                                <a asp-page="cart" asp-page-handler="delete" asp-route-id="@cart.ProductId">Remove</a>
+                            </div>
+                        </div>
+                        <div class="cart-item-function">
+                            <a asp-page="cart" asp-page-handler="decrease" asp-route-id="@cart.ProductId">-</a>
+                            <a asp-page="cart" asp-page-handler="increase" asp-route-id="@cart.ProductId">+</a>
+                            <input type="text" value="@cart.Quantity" disabled />
+                            @if(ViewData["msgProduct"] != null){
+                                <p>@ViewData["msgProduct"]</p>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+            
+        </div>
+        <div id="cart-summary">
+            <div id="cart-summary-content">Total amount: <span style="color:red">@ViewData["total"]</span></div>
+        </div>
+        <form method="post">
+            <div id="customer-info">
+                <div id="customer-info-content">
+                    <h3>CUSTOMER INFORMATION:</h3>
+                    <div id="customer-info-detail">
+                        <div id="customer-info-left">
+                            <input type="text" value="" asp-for="Customer.CompanyName" /><br />
+                            <input type="text" value="" asp-for="Customer.ContactName" /><br />
+                        </div>
+                        <div id="customer-info-right">
+                            <input type="text" value="" asp-for="Customer.ContactTitle" /><br />
+                            <input type="text" value="" asp-for="Customer.Address" /><br />
+                        </div>
+                        @if (ViewData["msg"] != null)
+                        {
+                            <p>@ViewData["msg"]</p>
+                        }
+                        <input type="date" value="@Model.RequiredDate" asp-for="RequiredDate"/>
+                    </div>
+                </div>
+            </div>
+            <div id="customer-info">
+                <div id="customer-info-content">
+                    <h3>PAYMENT METHODS:</h3>
+                    <div id="customer-info-payment">
+                        <div>
+                            <input type="radio" name="rbPaymentMethod" checked />
+                            Payment C.O.D - Payment on delivery
+                        </div>
+                        <div>
+                            <input type="radio" name="rbPaymentMethod" disabled />
+                            Payment via online payment gateway
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="cart-order">
+                <input type="submit" value="ORDER"  />
+            </div>
+        </form>
+    </div>
+</div>

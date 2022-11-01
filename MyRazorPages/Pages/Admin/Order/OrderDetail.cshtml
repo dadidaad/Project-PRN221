@@ -1,0 +1,49 @@
+﻿@page
+@model MyRazorPages.Pages.Admin.Order.OrderDetailModel
+@{
+}
+<div class="path-admin">ORDER DETAIL</b></div>
+<div class="content-main">
+    <div id="content-main-dashboard">
+        <div>
+            @if(ViewData["order"] != null){
+                var order = ViewData["order"] as Order;
+                <div class="profile-order-title">
+                    <div class="profile-order-title-left">
+                        <div>OrderID: @order.OrderId</div>
+                        <div>Order creation date: @Convert.ToDateTime(order.OrderDate).ToString("dd/MM/yyyy") </div>
+                    </div>
+                    <div class="profile-order-title-right">
+                        @if (order.ShippedDate != null)
+                        {
+                            <p style="color:green">Completed</p>
+                        }
+                        @if (order.ShippedDate == null && order.Employee == null && order.RequiredDate != null)
+                        {
+                            <p style="color:blue">Pending</p>
+                            <a asp-page="order" asp-page-handler="cancelOrder" asp-route-id="@order.OrderId" style="color:red">Cancel</a>
+                        }
+                        @if (order.RequiredDate == null)
+                        {
+                            <p style="color: red">Canceled</p>
+                        }
+                    </div>
+                </div>
+            }
+            @if (ViewData["orderDetailList"] != null)
+            {
+                var list = ViewData["orderDetailList"] as List<OrderDetail>;
+                foreach(var od in list){
+                    <div class="profile-order-content" style="background-color: white;">
+                        <div class="profile-order-content-col1">
+                            <a href="detail.html"><img src="~/img/1.jpg" width="100%" /></a>
+                        </div>
+                        <div class="profile-order-content-col2">@od.Product.ProductName</div>
+                        <div class="profile-order-content-col3">Quantity: @od.Quantity</div>
+                        <div class="profile-order-content-col4">@(((float)od.UnitPrice * @od.Quantity * (1 - @od.Discount)).ToString("0.00"))$</div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>

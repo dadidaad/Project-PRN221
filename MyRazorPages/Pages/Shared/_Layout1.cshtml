@@ -1,0 +1,55 @@
+﻿
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index</title>
+    <link href="~/css/style.css" rel="stylesheet" />
+</head>
+<body>
+    <div id="container">
+        <div id="header">
+            <div id="logo">
+                <a href="~/index"><img src="~/img/logo.png" /></a>
+            </div>
+            <div id="banner">
+                <ul>
+                    @if (Context.Session.Get("JWToken") == null)
+                    {
+                        <li><a href="~/account/signin">SignIn</a></li>
+                        <li><a href="~/account/signup">SignUp</a></li>
+                    }
+                    else
+                    {
+                        <p>Welcome @Context.User.Claims.First(c => c.Type == ClaimTypes.Email).Value</p>
+                        <li><a href="~/account/profile">Profile</a></li>
+                        <li><a href="#">SignOut</a></li>
+                    }
+                    @{int numberInCart = 0;
+                    if (Context.Session.GetString("cart") != null){
+                    numberInCart = JsonSerializer.Deserialize<List<Cart>>(Context.Session.GetString("cart")).Count();
+                    }
+                    }
+                    <li>
+                        <a href="~/account/cart">
+                            Cart : <span id="cart-number">@numberInCart</span>
+                            </a></li>
+                </ul>
+            </div>
+        </div>
+        <div id="content">
+            @RenderBody()
+        </div>
+        <div id="footer">footer</div>
+    </div>
+    <script src="~/libs/jquery/dist/jquery.min.js"></script>
+    <script src="~/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
+    <script src="~/js/site.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

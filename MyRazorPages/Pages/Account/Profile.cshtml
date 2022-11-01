@@ -1,0 +1,24 @@
+﻿@page
+@model MyRazorPages.Pages.Account.ProfileModel
+@{
+}
+<div id="content">
+    <div id="content-left">
+        <h3 style="font-weight: normal;">Welcome, @ViewData["Display name"]</h3>
+        <h4 style="font-weight: bold; color: darkred">@ViewData["Role"]</h4>
+        <h3>Account Management</h3>
+        <ul>
+            <a href="~/account/userprofile">
+            <li>Personal information</li></a>
+        </ul>
+        <h3>My order</h3>
+        <ul>
+            <a href="~/account/userorder">
+            <li>All orders</li></a>
+            <a href="#">
+            <li>Canceled order</li></a>
+        </ul>
+    </div>
+    <div id="content-right">
+    </div>
+</div>
