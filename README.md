@@ -1,0 +1,3 @@
+# Project-PRN221
+- Simple .net 6 razor page
+- Using some technical like SignalR, JWT for authentication and authorization, work with enity framework, using mime mail to send mail, work with identity,... 
