@@ -52,6 +52,7 @@
                 <div id="customer-info-content">
                     <h3>CUSTOMER INFORMATION:</h3>
                     <div id="customer-info-detail">
+                        @if(Model.Customer != null){
                         <div id="customer-info-left">
                             <input type="text" value="" asp-for="Customer.CompanyName" /><br />
                             <input type="text" value="" asp-for="Customer.ContactName" /><br />
@@ -60,6 +61,7 @@
                             <input type="text" value="" asp-for="Customer.ContactTitle" /><br />
                             <input type="text" value="" asp-for="Customer.Address" /><br />
                         </div>
+                        }
                         @if (ViewData["msg"] != null)
                         {
                             <p>@ViewData["msg"]</p>

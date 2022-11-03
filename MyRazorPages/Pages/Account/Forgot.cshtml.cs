@@ -49,7 +49,7 @@ namespace MyRazorPages.Pages.Account
                   protocol: Request.Scheme);
             var message = new Message(new string[] { user.Email },
                 "Reset password token",
-                $"Follow this <a href='{callbackUrl}'>link</a> to enter new password");
+                $"Follow this <a href='{callbackUrl}'>link</a> to enter new password", null);
             await _emailSender.SendEmailAsync(message);
             return RedirectToPage("/Account/ForgotConfirmation");
         }

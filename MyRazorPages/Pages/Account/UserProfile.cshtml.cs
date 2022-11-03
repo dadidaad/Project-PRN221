@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using MyRazorPages.Config;
 using MyRazorPages.Models;
 using MyRazorPages.Utils;
 using System.Text.Json;
@@ -8,7 +9,7 @@ using System.Text.Json.Serialization;
 
 namespace MyRazorPages.Pages.Account
 {
-    [Authorize]
+    [Authorize(UserRoles.Employee, UserRoles.Customer)]
     public class UserProfileModel : PageModel
     {
         private readonly PRN221DBContext dbContext;

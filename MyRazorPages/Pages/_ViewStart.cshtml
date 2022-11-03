@@ -1,7 +1,7 @@
 ﻿@{
     Boolean checkLayout = false;
     @if (Context.Session.Get("JWToken") != null ){
-        if (Context.User.Claims.First(c => c.Type == ClaimTypes.Email).Value.Equals(UserRoles.Employee))
+        if (Context.User.Claims.First(c => c.Type == ClaimTypes.Role).Value.Equals(UserRoles.Employee))
         {
             checkLayout = true;
         }

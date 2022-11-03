@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using MyRazorPages.Config;
+using MyRazorPages.EmailService;
 using MyRazorPages.Hubs;
 using MyRazorPages.Models;
 using MyRazorPages.Utils;
+using System.Security.Claims;
 using System.Text.Json;
 
 namespace MyRazorPages.Pages.Account
@@ -15,10 +17,14 @@ namespace MyRazorPages.Pages.Account
     {
         private readonly IHubContext<ServerHub> hubContext;
         private readonly PRN221DBContext dbContext;
-        public UserOrderModel(IHubContext<ServerHub> hubContext, PRN221DBContext dbContext)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IEmailSender _emailSender;
+        public UserOrderModel(IHubContext<ServerHub> hubContext, PRN221DBContext dbContext, IWebHostEnvironment webHostEnvironment, IEmailSender emailSender)
         {
             this.hubContext = hubContext;
             this.dbContext = dbContext;
+            this._webHostEnvironment = webHostEnvironment;
+            this._emailSender = emailSender;
         }
 
         public void OnGet()
@@ -35,6 +41,22 @@ namespace MyRazorPages.Pages.Account
             ViewData["Order"] = orders.Count > 0 ? orders : null;
         }
 
+        public async Task<IActionResult> OnGetExportInvoice(int OrderId)
+        {
+            var order = await dbContext.Orders.FirstOrDefaultAsync(o => o.OrderId == OrderId);
+            if(order == null)
+            {
+                return Page();
+            }
+            InvoiceHelper invoiceHelper = new InvoiceHelper(_webHostEnvironment, dbContext);
+            IFormFile invoiceFilePdf = invoiceHelper.GenerateInvoice(OrderId);
+            var userEmail = HttpContext.User.Claims.First(c => c.Type == ClaimTypes.Email).Value;
+            var message = new Message(new string[] { userEmail },
+               $"Export invoice for order {OrderId}" ,
+               $"Your invoice here", new FormFileCollection { invoiceFilePdf});
+            await _emailSender.SendEmailAsync(message);
+            return RedirectToPage("/Account/UserOrder");
+        }
         public async Task<IActionResult> OnGetCancelOrder(int OrderId)
         {
             using (var _context = new PRN221DBContext())

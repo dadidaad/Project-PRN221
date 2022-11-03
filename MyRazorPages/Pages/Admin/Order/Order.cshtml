@@ -54,6 +54,7 @@
                                 {
                                     <p style="color:blue">Pending</p>
                                     <a asp-page="order" asp-page-handler="cancelOrder" asp-route-OrderId="@order.OrderId" style="color:red">Cancel</a>
+                                    <a asp-page="order" asp-page-handler="confirmOrder" asp-route-OrderId="@order.OrderId" style="color: forestgreen">Confirm</a>
                                 }
                                 @if (order.RequiredDate == null)
                                 {

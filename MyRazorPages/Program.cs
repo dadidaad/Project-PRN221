@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using MyRazorPages.Utils;
+using Microsoft.AspNetCore.Http.Features;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +44,11 @@ builder.Services
         options.PayloadSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
         options.PayloadSerializerOptions.PropertyNamingPolicy = null;
     });
+builder.Services.Configure<FormOptions>(o => {
+    o.ValueLengthLimit = int.MaxValue;
+    o.MultipartBodyLengthLimit = int.MaxValue;
+    o.MemoryBufferThreshold = int.MaxValue;
+});
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

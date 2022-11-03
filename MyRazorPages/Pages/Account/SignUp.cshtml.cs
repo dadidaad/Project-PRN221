@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -9,9 +10,10 @@ namespace MyRazorPages.Pages.Account
     public class SignUpModel : PageModel
     {
         private readonly PRN221DBContext dbContext;
-
-        public SignUpModel(PRN221DBContext dBContext)
+        private readonly UserManager<Models.Account> userManager;
+        public SignUpModel(PRN221DBContext dBContext, UserManager<Models.Account> userManager)
         {
+            this.userManager = userManager;
             this.dbContext = dBContext;
         }
         [BindProperty] 
@@ -27,7 +29,7 @@ namespace MyRazorPages.Pages.Account
             ModelState.Remove("Customer.CustomerId");
             if (ModelState.IsValid)
             {
-                var acc = await dbContext.Accounts.SingleOrDefaultAsync(a => a.Email.Equals(Account.Email));
+                var acc = await userManager.FindByEmailAsync(Account.Email);
                 if (acc != null)
                 {
                     ViewData["msg"] = "Email is existed";
@@ -52,8 +54,16 @@ namespace MyRazorPages.Pages.Account
                         Role = 2
                     };
                     await dbContext.Customers.AddAsync(cust);
-                    await dbContext.Accounts.AddAsync(newAcc);
                     await dbContext.SaveChangesAsync();
+                    var result = await userManager.CreateAsync(newAcc, newAcc.Password);
+                    if (!result.Succeeded)
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            ModelState.TryAddModelError(error.Code, error.Description);
+                        }
+                        return Page();
+                    }
                     return RedirectToPage("/index");
                 }
             }

@@ -42,6 +42,7 @@
                                     }
                                     @if(order.ShippedDate != null){
                                         <span style="color:blue;">Completed</span>
+                                        <a asp-page="/Account/UserOrder" asp-page-handler="exportInvoice" asp-route-OrderId="@order.OrderId" style="color:blueviolet">Export Invoice</a>
                                     }
                                 </div>
                             </div>

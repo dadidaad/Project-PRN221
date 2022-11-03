@@ -47,8 +47,8 @@ namespace MyRazorPages.Pages.Account
             ViewData["total"] = totalPrice.ToString("0.00");
             if (HttpContext.Session.GetString("JWToken") != null)
             {
-                var userId = HttpContext.User.Claims.First(c => c.Type == "USERID").Value;
-                var user = await dBContext.Accounts.Include(a => a.Customer).FirstOrDefaultAsync(a => a.AccountId == Int32.Parse("USERID"));
+                var userEmail = HttpContext.User.Claims.First(c => c.Type == ClaimTypes.Email).Value;
+                var user = await dBContext.Accounts.Include(a => a.Customer).FirstOrDefaultAsync(a => a.Email.Equals(userEmail));
                 this.Customer = user.Customer;
             }
         }
@@ -182,8 +182,8 @@ namespace MyRazorPages.Pages.Account
                 var cart = JsonSerializer.Deserialize<List<Cart>>(HttpContext.Session.GetString("cart"));
                 if (HttpContext.Session.Get("JWToken") != null)
                 {
-                    var userId = HttpContext.User.Claims.First(c => c.Type == "USERID").Value;
-                    var acc = await dBContext.Accounts.Include(a => a.Customer).FirstOrDefaultAsync(a => a.AccountId == Int32.Parse("USERID"));
+                    var userEmail = HttpContext.User.Claims.First(c => c.Type == ClaimTypes.Email).Value;
+                    var acc = await dBContext.Accounts.Include(a => a.Customer).FirstOrDefaultAsync(a => a.Email.Equals(userEmail));
                     Customer.CustomerId = acc.CustomerId;
                     Customer = acc.Customer;
                     checkInsertCus = false;

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using MyRazorPages.Config;
 using MyRazorPages.Models;
 using MyRazorPages.Utils;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 
@@ -27,15 +28,34 @@ namespace MyRazorPages.Pages.Admin.Order
         }
         public IActionResult OnGetCancelOrder(int OrderId)
         {
-            if (HttpContext.Session.Get("user") != null )
+            if (HttpContext.Session.Get("JWToken") != null )
             {
-                Models.Account acc = JsonSerializer.Deserialize<Models.Account>(HttpContext.Session.Get("user"));
+                var userEmail = HttpContext.User.Claims.First(c => c.Type == ClaimTypes.Email).Value;
+                var acc = _context.Accounts.FirstOrDefault(a => a.Email.Equals(userEmail));
                 if(acc.Role == 1)
                 {
                     var order = _context.Orders.FirstOrDefault(o => o.OrderId == OrderId);
                     order.EmployeeId = acc.EmployeeId;
                     order.Employee = acc.Employee;
                     order.RequiredDate = null;
+                    _context.Orders.Update(order);
+                    _context.SaveChanges();
+                }
+            }
+            return RedirectToPage("/Admin/Order/Order");
+        }
+        public IActionResult OnGetConfirmOrder(int OrderId)
+        {
+            if (HttpContext.Session.Get("JWToken") != null)
+            {
+                var userEmail = HttpContext.User.Claims.First(c => c.Type == ClaimTypes.Email).Value;
+                var acc = _context.Accounts.FirstOrDefault(a => a.Email.Equals(userEmail));
+                if (acc.Role == 1)
+                {
+                    var order = _context.Orders.FirstOrDefault(o => o.OrderId == OrderId);
+                    order.EmployeeId = acc.EmployeeId;
+                    order.Employee = acc.Employee;
+                    order.ShippedDate = DateTime.Now;
                     _context.Orders.Update(order);
                     _context.SaveChanges();
                 }

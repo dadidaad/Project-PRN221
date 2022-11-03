@@ -14,7 +14,9 @@ namespace MyRazorPages.Models
 
         public Task<IdentityResult> CreateAsync(Account user, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            db.Accounts.AddAsync(user);
+            db.SaveChangesAsync();
+            return Task.FromResult(IdentityResult.Success);
         }
 
         public Task<IdentityResult> DeleteAsync(Account user, CancellationToken cancellationToken)
@@ -45,7 +47,7 @@ namespace MyRazorPages.Models
 
         public async Task<string> GetEmailAsync(Account user, CancellationToken cancellationToken)
         {
-            return (await db.Accounts.FirstOrDefaultAsync(a => a.Email.Equals(user.Email))).Email;
+            return user.Email;
         }
 
         public Task<bool> GetEmailConfirmedAsync(Account user, CancellationToken cancellationToken)
@@ -75,7 +77,7 @@ namespace MyRazorPages.Models
 
         public async Task<string> GetUserNameAsync(Account user, CancellationToken cancellationToken)
         {
-            return (await db.Accounts.FirstOrDefaultAsync(a => a.Email.Equals(user.Email))).Email; 
+            return user.Email; 
         }
 
         public Task<bool> HasPasswordAsync(Account user, CancellationToken cancellationToken)

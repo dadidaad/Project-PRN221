@@ -47,7 +47,7 @@ namespace MyRazorPages.Config
                     audience: "http://localhost:5000/",
                     claims: (IEnumerable<Claim>)GetUserClaims(user),
                     notBefore: new DateTimeOffset(DateTime.Now).DateTime,
-                    expires: new DateTimeOffset(DateTime.Now.AddDays(1)).DateTime,
+                    expires: new DateTimeOffset(DateTime.Now.AddMinutes(1)).DateTime,
                     //Using HS256 Algorithm to encrypt Token  
                     signingCredentials: new SigningCredentials
                     (new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

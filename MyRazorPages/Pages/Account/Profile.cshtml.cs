@@ -1,12 +1,13 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using MyRazorPages.Config;
 using MyRazorPages.Models;
 using MyRazorPages.Utils;
 using Remotion.FunctionalProgramming;
 
 namespace MyRazorPages.Pages.Account
 {
-    [Authorize]
+    [Authorize(UserRoles.Customer, UserRoles.Employee)]
     public class ProfileModel : PageModel
     {
         private readonly PRN221DBContext dBContext;
