@@ -7,9 +7,12 @@ using MyRazorPages.Config;
 using MyRazorPages.Hubs;
 using MyRazorPages.Models;
 using MyRazorPages.Utils;
+using OfficeOpenXml;
+using System.ComponentModel;
 using System.Data;
 using System.Data.Entity.Validation;
 using System.Data.OleDb;
+using LicenseContext = OfficeOpenXml.LicenseContext;
 
 namespace MyRazorPages.Pages.Admin.Product
 {
@@ -137,6 +140,36 @@ namespace MyRazorPages.Pages.Admin.Product
             return RedirectToPage("/Admin/Product/Index");
         }
 
+        public IActionResult OnGetExportExcel()
+        {
+            // query data from database   
+          
+            var stream = new MemoryStream();
+            //required using OfficeOpenXml;
+            // If you use EPPlus in a noncommercial context
+            // according to the Polyform Noncommercial license:
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            var productList = _context.Products.Include(p => p.Category)
+                .Select(p => new 
+                { p.ProductId, 
+                    p.ProductName, 
+                  p.CategoryId,
+                  p.QuantityPerUnit,
+                  p.UnitPrice,
+                  p.UnitsInStock,
+                  p.Discontinued
+                }).ToList(); 
+            using (var package = new ExcelPackage(stream))
+            {
+                var workSheet = package.Workbook.Worksheets.Add("Sheet1");
+                workSheet.Cells.LoadFromCollection(productList, true);
+                package.Save();
+            }
+            stream.Position = 0;
+            string excelName = $"ProductList-{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xlsx";
+            return File(stream, "application/octet-stream", excelName);
+            //return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", excelName);
+        }
         private IConfigurationRoot getConfiguration()
         {
             var builder = new ConfigurationBuilder()

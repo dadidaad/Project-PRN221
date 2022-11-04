@@ -38,6 +38,7 @@
                     <label for="upload-file">Import .xls or .xlsx file</label>
                     <input type="file" name="FileUpload" id="upload-file" onchange="document.getElementById('uploadForm').submit();" />
                 </form>
+                <a asp-page="/Admin/Product/Index" asp-page-handler="exportExcel" class="btn btn-primary">Export to excel</a>
                 <script>
                     var _validFileExtensions = [".xls", ".xlsx"];
                     function Validate(oForm) {

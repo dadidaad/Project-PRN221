@@ -9,13 +9,14 @@
         <div id="order-title">
             <b>Filter by Order date:</b>
             <form>
-                From:@Html.TextBoxFor(c => c.CurrentFilterFromDate, new { @type="date",  @Value = Model.CurrentFilterFromDate?.ToString("d") ?? String.Format("yyyy-MM-dd") } )
-                To:@Html.TextBoxFor(c => c.CurrentFilterToDate, new { @type="date",  @Value = Model.CurrentFilterToDate?.ToString("d") ?? String.Format("yyyy-MM-dd")} )
+                @Html.TextBoxFor(m => m.CurrentFilterFromDate, "{0:yyyy-MM-dd}", htmlAttributes: new { @type="date" })
+                @Html.TextBoxFor(m => m.CurrentFilterToDate, "{0:yyyy-MM-dd}", htmlAttributes: new { @type="date" })
                 <input type="submit" value="Filter">
             </form>
             @if(ViewData["date_noti"] != null){
                 <p style="color:red">@ViewData["date_noti"]</p>
             }
+            <a asp-page="/Admin/Order/Order" asp-page-handler="exportExcel" asp-route-FromDate="@(Model.CurrentFilterFromDate?.ToString("yyyy-MM-dd"))" asp-route-ToDate="@(Model.CurrentFilterToDate?.ToString("yyyy-MM-dd"))">Export to excel</a>
         </div>
         <div id="order-table">
             <table id="orders">
